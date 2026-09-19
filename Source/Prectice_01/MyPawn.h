@@ -13,7 +13,7 @@ class UMyStaticMeshComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UFloatingPawnMovement;
-
+class AMyRocket;
 
 UCLASS()
 class PRECTICE_01_API AMyPawn : public APawn
@@ -48,6 +48,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UFloatingPawnMovement> Movement;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	TSubclassOf<AMyRocket> RocketTemplate;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -62,4 +65,6 @@ public:
 	void Roll(float Value);
 
 	void Pitch(float Value);
+
+	void Fire();
 };

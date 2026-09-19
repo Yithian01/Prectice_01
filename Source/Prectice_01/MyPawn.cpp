@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/GameplayStatics.h"
+#include "MyRocket.h"
 
 // Sets default values
 AMyPawn::AMyPawn()
@@ -20,11 +21,11 @@ AMyPawn::AMyPawn()
 	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	RootComponent = Box;
 
-	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
-	Arrow->SetupAttachment(Box);
-
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(Box);
+
+	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
+	Arrow->SetupAttachment(Body);
 
 	Left = CreateDefaultSubobject<UMyStaticMeshComponent>(TEXT("Left"));
 	Left->SetupAttachment(Body);
@@ -40,6 +41,7 @@ AMyPawn::AMyPawn()
 
 	Movement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Movement"));
 	
+	Arrow->SetRelativeLocation(FVector(99.f, 0, 0));
 	SpringArm->TargetArmLength = 150;
 	SpringArm->SocketOffset = FVector(0, 0, 50.f);
 	Movement->MaxSpeed = 0.f; // 일단 안 움직이게 설정
@@ -61,6 +63,11 @@ AMyPawn::AMyPawn()
 	Left->SetRelativeLocation(FVector(36.f, -21.f, 0));
 	Right->SetRelativeLocation(FVector(36.f, 21.f, 0));
 
+	ConstructorHelpers::FClassFinder<AMyRocket> BP_MyRocket(TEXT("/Script/Engine.Blueprint'/Game/BP/CPP/BP_MyRocket.BP_MyRocket_C'"));
+	if (BP_MyRocket.Succeeded())
+	{
+		RocketTemplate = BP_MyRocket.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -82,6 +89,7 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction(TEXT("Fire"),IE_Pressed, this, &AMyPawn::Fire);
 	PlayerInputComponent->BindAxis(TEXT("Pitch"), this, &AMyPawn::Pitch);
 	PlayerInputComponent->BindAxis(TEXT("Roll"), this, &AMyPawn::Roll);
 }
@@ -94,4 +102,9 @@ void AMyPawn::Pitch(float Value)
 void AMyPawn::Roll(float Value)
 {
 	AddActorLocalRotation(FRotator(0, 0, FMath::Clamp(Value,-1, 1) * 60.f * UGameplayStatics::GetWorldDeltaSeconds(GetWorld())));
+}
+
+void AMyPawn::Fire()
+{
+	GetWorld()->SpawnActor<AMyRocket>(RocketTemplate, Arrow->K2_GetComponentToWorld());
 }

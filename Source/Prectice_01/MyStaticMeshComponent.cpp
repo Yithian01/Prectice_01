@@ -12,6 +12,5 @@ void UMyStaticMeshComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	UE_LOG(LogTemp, Warning, TEXT("HERE"));
 	AddLocalRotation(FRotator(0, 0, RotationSpeed * DeltaTime));
 }

@@ -47,12 +47,14 @@ void AMyRocket::BeginPlay()
 void AMyRocket::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	
 }
 
 void AMyRocket::ProcessBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
+
+	UE_LOG(LogTemp, Warning, TEXT("Begin Oberlap"));
+
 	if (!(OtherActor->ActorHasTag("Player")))
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
